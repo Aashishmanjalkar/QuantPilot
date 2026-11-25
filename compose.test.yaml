@@ -1,0 +1,33 @@
+# Throwaway Postgres + Redis for apps/api integration tests, isolated from dev data
+# (docs/environment.md). Usage:
+#   docker compose -f compose.test.yaml up -d --wait
+#   pnpm test:integration
+#   docker compose -f compose.test.yaml down -v
+name: quantpilot-test
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+      POSTGRES_DB: quantpilot_test
+    ports:
+      - "127.0.0.1:55432:5432"
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U test -d quantpilot_test"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "127.0.0.1:56379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 3s
+      retries: 30

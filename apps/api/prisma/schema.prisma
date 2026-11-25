@@ -1,0 +1,41 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum RunStatus {
+  queued
+  running
+  completed
+  failed
+}
+
+model Strategy {
+  id         String        @id @default(uuid()) @db.Uuid
+  name       String
+  /// Validated strategy definition (schema owned by services/quant, ADR-0002).
+  definition Json
+  createdAt  DateTime      @default(now())
+  runs       BacktestRun[]
+}
+
+model BacktestRun {
+  id         String    @id @default(uuid()) @db.Uuid
+  strategyId String    @db.Uuid
+  strategy   Strategy  @relation(fields: [strategyId], references: [id], onDelete: Cascade)
+  status     RunStatus @default(queued)
+  progress   Int       @default(0)
+  /// BacktestResult JSON from services/quant, validated before storing.
+  result     Json?
+  /// User-facing failure message; never contains secrets (QP-STD-006).
+  error      String?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@index([strategyId])
+}

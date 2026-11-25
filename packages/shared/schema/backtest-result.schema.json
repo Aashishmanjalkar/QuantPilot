@@ -1,0 +1,288 @@
+{
+  "$defs": {
+    "BacktestAssumptions": {
+      "additionalProperties": false,
+      "properties": {
+        "benchmark": {
+          "const": "buy_and_hold_same_ticker",
+          "default": "buy_and_hold_same_ticker",
+          "title": "Benchmark",
+          "type": "string"
+        },
+        "commission_bps": {
+          "title": "Commission Bps",
+          "type": "number"
+        },
+        "data_source": {
+          "title": "Data Source",
+          "type": "string"
+        },
+        "fill": {
+          "const": "next_bar_open",
+          "default": "next_bar_open",
+          "title": "Fill",
+          "type": "string"
+        },
+        "open_position_valuation": {
+          "const": "last_close_before_exit_costs",
+          "default": "last_close_before_exit_costs",
+          "title": "Open Position Valuation",
+          "type": "string"
+        },
+        "price_adjustment": {
+          "const": "split_and_dividend_adjusted",
+          "default": "split_and_dividend_adjusted",
+          "title": "Price Adjustment",
+          "type": "string"
+        },
+        "slippage_bps": {
+          "title": "Slippage Bps",
+          "type": "number"
+        },
+        "warmup_bars": {
+          "description": "Bars before start_date used only to warm up indicators.",
+          "minimum": 0,
+          "title": "Warmup Bars",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "commission_bps",
+        "slippage_bps",
+        "data_source",
+        "warmup_bars"
+      ],
+      "title": "BacktestAssumptions",
+      "type": "object"
+    },
+    "EquityPoint": {
+      "additionalProperties": false,
+      "properties": {
+        "benchmark": {
+          "title": "Benchmark",
+          "type": "number"
+        },
+        "date": {
+          "format": "date",
+          "title": "Date",
+          "type": "string"
+        },
+        "equity": {
+          "title": "Equity",
+          "type": "number"
+        }
+      },
+      "required": [
+        "date",
+        "equity",
+        "benchmark"
+      ],
+      "title": "EquityPoint",
+      "type": "object"
+    },
+    "Metrics": {
+      "additionalProperties": false,
+      "properties": {
+        "benchmark_total_return_pct": {
+          "title": "Benchmark Total Return Pct",
+          "type": "number"
+        },
+        "cagr_pct": {
+          "title": "Cagr Pct",
+          "type": "number"
+        },
+        "exposure_pct": {
+          "title": "Exposure Pct",
+          "type": "number"
+        },
+        "max_drawdown_pct": {
+          "title": "Max Drawdown Pct",
+          "type": "number"
+        },
+        "num_trades": {
+          "title": "Num Trades",
+          "type": "integer"
+        },
+        "sharpe": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Annualized, risk-free rate 0; null if undefined.",
+          "title": "Sharpe"
+        },
+        "total_costs": {
+          "title": "Total Costs",
+          "type": "number"
+        },
+        "total_return_pct": {
+          "title": "Total Return Pct",
+          "type": "number"
+        },
+        "win_rate_pct": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Win Rate Pct"
+        }
+      },
+      "required": [
+        "total_return_pct",
+        "cagr_pct",
+        "sharpe",
+        "max_drawdown_pct",
+        "num_trades",
+        "win_rate_pct",
+        "exposure_pct",
+        "total_costs",
+        "benchmark_total_return_pct"
+      ],
+      "title": "Metrics",
+      "type": "object"
+    },
+    "Trade": {
+      "additionalProperties": false,
+      "properties": {
+        "entry_date": {
+          "format": "date",
+          "title": "Entry Date",
+          "type": "string"
+        },
+        "entry_price": {
+          "description": "Fill price including slippage.",
+          "title": "Entry Price",
+          "type": "number"
+        },
+        "exit_date": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Exit Date"
+        },
+        "exit_price": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Exit Price"
+        },
+        "pnl": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Net of costs; null while the trade is open.",
+          "title": "Pnl"
+        },
+        "quantity": {
+          "title": "Quantity",
+          "type": "number"
+        },
+        "return_pct": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Return Pct"
+        }
+      },
+      "required": [
+        "entry_date",
+        "entry_price",
+        "exit_date",
+        "exit_price",
+        "quantity",
+        "pnl",
+        "return_pct"
+      ],
+      "title": "Trade",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "assumptions": {
+      "$ref": "#/$defs/BacktestAssumptions"
+    },
+    "bars": {
+      "title": "Bars",
+      "type": "integer"
+    },
+    "end_date": {
+      "format": "date",
+      "title": "End Date",
+      "type": "string"
+    },
+    "equity_curve": {
+      "items": {
+        "$ref": "#/$defs/EquityPoint"
+      },
+      "title": "Equity Curve",
+      "type": "array"
+    },
+    "metrics": {
+      "$ref": "#/$defs/Metrics"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "start_date": {
+      "format": "date",
+      "title": "Start Date",
+      "type": "string"
+    },
+    "ticker": {
+      "title": "Ticker",
+      "type": "string"
+    },
+    "trades": {
+      "items": {
+        "$ref": "#/$defs/Trade"
+      },
+      "title": "Trades",
+      "type": "array"
+    }
+  },
+  "required": [
+    "ticker",
+    "start_date",
+    "end_date",
+    "bars",
+    "metrics",
+    "trades",
+    "equity_curve",
+    "assumptions"
+  ],
+  "title": "BacktestResult",
+  "type": "object"
+}
